@@ -165,7 +165,7 @@ const logoutUser = asyncHandler(async(req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $unset: {
+            $unset: {//these are aggretion pipeline fields
                 refreshToken: 1 // this removes the field from document
             }
         },
@@ -308,7 +308,7 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
-            $set:{
+            $set:{//aggregation pipeline
                 avatar: avatar.url
             }
         },
@@ -330,6 +330,15 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
     }
 
     //TODO: delete old image - assignment
+    const user = await User.findById(
+        req.user?._id,
+        {
+            $unset:{
+                coverImage: coverImage.url
+            }
+        },
+        {new: false}
+    ).select("-password")
 
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
@@ -339,8 +348,8 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
         
     }
 
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
+    const user1 = await User.findByIdAndUpdate(
+        req.user1?._id,
         {
             $set:{
                 coverImage: coverImage.url
@@ -366,20 +375,21 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
 
     const channel = await User.aggregate([
         {
-            $match: {
+            $match: {//finds document in which username matches
                 userName: userName?.toLowerCase()
             }
-        },
+        },//now i have only 1 document
         {
-            $lookup: {
+            $lookup: {//joining this only document to subscritions model
+                        //to find subscribers
                 from: "subscriptions",
-                localField: "_id",
-                foreignField: "channel",
+                localField: "_id",//look in _id local field
+                foreignField: "channel",//select channel for subscribers
                 as: "subscribers"
             }
         },
         {
-            $lookup: {
+            $lookup: {// for subscribed by channel
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "subscriber",
@@ -404,7 +414,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
             }
         },
         {
-            $project: {
+            $project: {//this is letting following fields to pass further
                 fullName: 1,
                 userName: 1,
                 subscribersCount: 1,
@@ -430,28 +440,36 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
 })
 
 const getWatchHistory = asyncHandler(async(req, res) => {
-    const user = await User.aggregate([
+    const user = await User.aggregate([//applying aggregation 
+    //on User collection
         {
             $match: {
                 _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
-            $lookup: {
+            $lookup: {//joins to another collection of videos
                 from: "videos",
+                //joining watchhistory of user to 
+                //id of video
                 localField: "watchHistory",
                 foreignField: "_id",
                 as: "watchHistory",
                 pipeline: [
                     {
-                        $lookup: {
+                        $lookup: {//joins to another collection of users
+                            //matching the owner field of the 
+                            //videos with the _id field of documents in the "users" collection.
                             from: "users",
-                            localField: "owner",
+                            localField: "owner",//video owner
                             foreignField: "_id",
                             as: "owner",
                             pipeline: [
                                 {
-                                    $project: {
+                                    $project: {//It selects only specific fields
+                                        // (fullName, userName, avatar)
+                                        // from the documents retrieved from 
+                                        //the "users" collection.
                                         fullName: 1,
                                         userName: 1,
                                         avatar: 1
@@ -482,7 +500,6 @@ const getWatchHistory = asyncHandler(async(req, res) => {
         )
     )
 })
-
 
 export {
     registerUser,
