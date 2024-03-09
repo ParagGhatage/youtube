@@ -4,9 +4,17 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {Comment} from '../models/comment.model.js'
+import { Playlist } from "../models/playlist.model.js"
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const { _id } = req.query;
+    
+    const info= {
+      "name":"Liked Videos"
+  }
+  console.log(info.name)
+
+    //const description= "${req.user._id}"//whose playlist is this
  
   const existinglike = await Like.findOne({
     video: _id,
@@ -14,8 +22,11 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   });
   console.log(existinglike);
   if (existinglike) {
-    await existinglike.deleteOne();
-
+   await existinglike.deleteOne();
+    
+   
+    await Playlist.findOneAndUpdate({ name: "Liked Videos", owner: req.user._id },
+    { $pull: { videos: _id } })
     res.send(
         new ApiResponse(200,"Unliked the video!")
     )
@@ -26,6 +37,29 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
       video: _id,
       likedBy: req.user._id,
     });
+    const existingplaylist = await Playlist?.findOne({
+        name:info.name,
+        owner: req.user._id,
+      });
+      console.log(existingplaylist)
+      if(existingplaylist){
+        await existingplaylist.videos.push(_id)
+
+    console.log(existingplaylist)
+    const save = await existingplaylist.save()
+      }
+    
+    if(!existingplaylist){
+        const playlist = await Playlist.create({
+            name:info.name,
+            owner:req.user._id,
+            videos:[_id],
+            description:"liked videos"
+        })
+
+        await playlist.save()
+       
+    }
     console.log("new like created!");
     console.log(like);
     res.send(
@@ -107,6 +141,26 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
+    const {userId} = req.query
+    const videos = await Like.aggregate(
+      [
+          {
+              $match:{
+                  likedBy:new mongoose.Types.ObjectId(userId)
+              }
+  
+          },
+          {
+            
+              $project:{
+                  video:1
+              }
+              }
+          
+      ]      
+  )
+
+  
 })
 
 export {

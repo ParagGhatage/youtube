@@ -22,16 +22,45 @@ const getChannelStats = asyncHandler(async (req, res) => {
             
         ]      
 )
+
+const videos = await Video.aggregate(
+    [
+        {
+            $match:{
+                owner:new mongoose.Types.ObjectId(userId)
+            }
+
+        }
+        
+    ]      
+)
+
+const videoViews = await User.aggregate(
+    [
+        {
+            $match:{
+                owner:new mongoose.Types.ObjectId(userId)
+            }
+
+        }
+        
+    ]      
+)
+
+
+
 console.log(subscribers)
+console.log(videos)
     subscribers.map(sub => sub);
-    const count= subscribers.length
-    console.log(count)
+    const totalSubCount= subscribers.length
+    const totalVideoCount  = videos.length
+    console.log(totalSubCount)
     return res
     .status(200)
     .json(
         new ApiResponse(
             200,
-            count,
+            {totalSubCount,totalVideoCount},
             "subscribers fetched successfully"
         )
     )
