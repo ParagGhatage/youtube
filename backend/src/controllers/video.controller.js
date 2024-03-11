@@ -9,8 +9,14 @@ import { upload } from "../middlewares/multer.middleware.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    const {userId } = req.query
     //TODO: get all videos based on query, sort, pagination
+
+    const videos = await Video.findOne({owner:new mongoose.Types.ObjectId(userId)})
+
+    res.send(
+        new ApiResponse(200,videos,"videos fetched!")
+    )
 })
 
 const publishAVideo =asyncHandler(async (req, res) => {
@@ -41,7 +47,7 @@ const publishAVideo =asyncHandler(async (req, res) => {
     })
     console.log(user);
 
-    res.send(new ApiResponse(200,"video uploaded successfully!"))
+    res.send(new ApiResponse(200,user,"video uploaded successfully!"))
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
@@ -49,7 +55,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     const video = await Video.findById(_id).select()
 
     res.send(
-        new ApiResponse(200,"video fetched successfully!")
+        new ApiResponse(200,video,"video fetched successfully!")
     )
 
     console.log(video)
@@ -59,11 +65,19 @@ const getVideoById = asyncHandler(async (req, res) => {
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const { _id } = req.query
-    const video = await Video.findByIdAndUpdate()
+    const { videoId } = req.query
+    const {title,description} = req.body
+   
+    const video = await Video.findByIdAndUpdate(
+        {_id:new mongoose.Types.ObjectId(videoId)},
+        {title:title,
+        description:description
+       }
+    )
+    await video.save()
 
     res.send(
-        new ApiResponse(200,"video updated successfully!")
+        new ApiResponse(200,video,"video updated successfully!")
     )
 
     console.log(video)
@@ -83,7 +97,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
    
 
     res.send(
-        new ApiResponse(200,"video deleted successfully!")
+        new ApiResponse(200,video,"video deleted successfully!")
     )
 
     console.log(tweet)
@@ -93,7 +107,32 @@ const deleteVideo = asyncHandler(async (req, res) => {
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
+    const { videoId } = req.query
+
+    const video = await Video.findById({
+        _id:new mongoose.Types.ObjectId(videoId)
+    })
+
+    if (video.isPublished){
+
+        await Video.findByIdAndUpdate({
+            _id:new mongoose.Types.ObjectId(videoId)
+        },
+        {isPublished:false})
+    }
+    if (!video.isPublished){
+
+        await Video.findByIdAndUpdate({
+            _id:new mongoose.Types.ObjectId(videoId)
+        },
+        {isPublished:true})
+    }
+
+
+    res.send(
+        new ApiResponse(200,!video.isPublished,"publish toggled!")
+    )
+
 })
 
 

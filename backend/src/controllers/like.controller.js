@@ -142,23 +142,27 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
     const {userId} = req.query
-    const videos = await Like.aggregate(
+    const videos = await Playlist.aggregate(
       [
           {
               $match:{
-                  likedBy:new mongoose.Types.ObjectId(userId)
+                  name:"Liked Videos",
+                  owner:new mongoose.Types.ObjectId(userId)
               }
   
           },
           {
             
               $project:{
-                  video:1
+                  videos:1
               }
               }
           
       ]      
   )
+  res.send(
+    new ApiResponse(200,videos,"fetched liked videos playlist!")
+)
 
   
 })

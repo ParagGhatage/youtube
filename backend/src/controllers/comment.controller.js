@@ -55,7 +55,7 @@ const addComment = asyncHandler(async (req, res) => {
 
     const comment = await Comment.create({content,comment_owner,video_owner,video})
     res.send(
-        new ApiResponse(200,"commented successfully!")
+        new ApiResponse(200,comment,"commented successfully!")
     )
 
     console.log(comment)
@@ -71,7 +71,7 @@ const updateComment = asyncHandler(async (req, res) => {
     })
 
     res.send(
-        new ApiResponse(200,"Comment updated successfully!")
+        new ApiResponse(200,comment,"Comment updated successfully!")
     )
 
     console.log(comment)
@@ -89,7 +89,7 @@ const deleteComment = asyncHandler(async (req, res) => {
    
 
     res.send(
-        new ApiResponse(200,"commented deleted successfully!")
+        new ApiResponse(200,comment,"commented deleted successfully!")
     )
 
     console.log(comment)

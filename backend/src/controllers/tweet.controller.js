@@ -15,13 +15,30 @@ const createTweet = asyncHandler(async (req, res) => {
     const owner = req.user._id
     const tweet = await Tweet.create({content,owner})
     res.send(
-        new ApiResponse(200,"tweeted successfully!")
+        new ApiResponse(200,tweet,"tweeted successfully!")
     )
     //TODO: create tweet
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
     // TODO: get user tweets
+    const {userId} = req.query
+
+    const tweets = await Tweet.aggregate(
+        [
+            {$match:{
+                owner:new mongoose.Types.ObjectId(userId)
+            }},
+            {$project:{
+                _id:1,
+                content:1,
+                createdAt:1
+            }}
+        ]
+    )
+    res.send(
+        new ApiResponse(200,tweets,"tweets fetched succesfully!")
+    )
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
@@ -32,7 +49,7 @@ const updateTweet = asyncHandler(async (req, res) => {
     })
 
     res.send(
-        new ApiResponse(200,"Tweet updated successfully!")
+        new ApiResponse(200,tweet,"Tweet updated successfully!")
     )
 
     console.log(tweet)
@@ -50,7 +67,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
    
 
     res.send(
-        new ApiResponse(200,"tweet deleted successfully!")
+        new ApiResponse(200,tweet,"tweet deleted successfully!")
     )
 
     console.log(tweet)

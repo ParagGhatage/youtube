@@ -27,7 +27,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
         })
 
         res.send(
-            new ApiResponse(200,"playlist created!")
+            new ApiResponse(200,playlist,"playlist created!")
         )
         console.log(playlist)
     }
@@ -35,7 +35,22 @@ const createPlaylist = asyncHandler(async (req, res) => {
 })
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
-    const {userId} = req.params
+    const {userId} = req.query
+
+    const playlists = await Playlist.aggregate(
+        [
+            {$match:{
+                owner:new mongoose.Types.ObjectId(userId)
+            }},
+        {$project:{
+            videos:1
+        }}
+        ]
+    )
+
+    res.send(
+        new ApiResponse(200,playlists,"playlists fetched successfully!")
+    )
     //TODO: get user playlists
 })
 
@@ -45,7 +60,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     const playlist = await Playlist.findById(playlistId).select()
 
     res.send(
-        new ApiResponse(200,"playlist fetched successfully!")
+        new ApiResponse(200,playlist,"playlist fetched successfully!")
     )
 
     console.log(playlist)
@@ -68,7 +83,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
     const save = await playlist.save()
     //console.log(newplaylist)
     res.send(
-        new ApiResponse(200,"video added to the playlist successfully!")
+        new ApiResponse(200,playlist,"video added to the playlist successfully!")
     )
 
 
@@ -90,7 +105,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const save = await playlist.save()
     //console.log(newplaylist)
     res.send(
-        new ApiResponse(200,"video removed the playlist!")
+        new ApiResponse(200,playlist,"video removed the playlist!")
     )
 
     // TODO: remove video from playlist
@@ -107,7 +122,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
    
 
     res.send(
-        new ApiResponse(200,"Playlist deleted successfully!")
+        new ApiResponse(200,playlist,"Playlist deleted successfully!")
     )
 
     console.log(playlist)
@@ -123,7 +138,7 @@ const updatePlaylist = asyncHandler(async (req, res) => {
     })
 
     res.send(
-        new ApiResponse(200,"Playlist updated successfully!")
+        new ApiResponse(200,playlist,"Playlist updated successfully!")
     )
 
     console.log(playlist)
