@@ -11,6 +11,7 @@ import Downloads from './pages/Downloads.jsx'
 import Myaccount from './pages/MyAccount.jsx'
 import Signup from './pages/Signup.jsx'
 import Login from './pages/Login.jsx'
+import Logout from './pages/Logout.jsx'
 import Copyright from './pages/Copyright.jsx'
 import About from './pages/About.jsx'
 import Contact from './pages/Contact.jsx'
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
       <Route path='/myaccount' element={<Myaccount/>}/>
       <Route path='/signup' element={<Signup/>}/>
       <Route path='/login' element={<Login/>}/>
+      <Route path='/logout' element={<Logout/>}/>
       <Route path='/contact' element={<Contact/>}/>
       <Route path='/about' element={<About/>}/>
       <Route path='/copyright' element={<Copyright/>}/>
