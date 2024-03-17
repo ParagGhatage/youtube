@@ -10,9 +10,14 @@ function Signup() {
         avatar: null,
     });
 
+    const [response,setResponse] = useState(" ")
+
+
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+  
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,7 +30,8 @@ function Signup() {
             formDataToSend.append('avatar', formData.avatar);
 
             const response = await axios.post('http://localhost:8000/api/v1/users/register', formDataToSend);
-            console.log('Response:', response.data);
+            console.log('Response:', response);
+            setResponse(response.data.message)
         } catch (error) {
             console.error(error);
         }
@@ -99,6 +105,8 @@ function Signup() {
                 <br />
                 <button type="submit" className='bg-green-500 p-3 rounded-sm m-4'>Submit</button>
             </form>
+          
+            <div className='text-black'>registered user:{response}</div>
         </div>
     );
 }
