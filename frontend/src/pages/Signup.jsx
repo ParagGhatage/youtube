@@ -21,19 +21,19 @@ function Signup() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
+       
             const formDataToSend = new FormData();
             formDataToSend.append('fullName', formData.fullName);
             formDataToSend.append('userName', formData.userName);
             formDataToSend.append('email', formData.email);
             formDataToSend.append('password', formData.password);
             formDataToSend.append('avatar', formData.avatar);
-
+            try {
             const response = await axios.post('http://localhost:8000/api/v1/users/register', formDataToSend);
-            console.log('Response:', response);
+            console.log('Response:',response.data.message );
             setResponse(response.data.message)
         } catch (error) {
-            console.error(error);
+            console.log("error:",error);
         }
     };
 
@@ -106,7 +106,7 @@ function Signup() {
                 <button type="submit" className='bg-green-500 p-3 rounded-sm m-4'>Submit</button>
             </form>
           
-            <div className='text-black'>registered user:{response}</div>
+            <div className='text-black'>{response}</div>
         </div>
     );
 }
