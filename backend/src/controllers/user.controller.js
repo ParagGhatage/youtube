@@ -37,7 +37,8 @@ const registerUser = asyncHandler( async (req, res) => {
 
 
     const {fullName, email, userName, password } = req.body
-    //console.log("email: ", email);
+    console.log(req.body);
+    console.log(fullName);
 
     if (
         [fullName, email, userName, password].some((field) => field?.trim() === "")
@@ -46,8 +47,11 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 
     const existedUser = await User.findOne({
-        $or: [{ userName }, { email }]
+        userName:userName,
+        email:email
     })
+
+    console.log(existedUser)
 
     if (existedUser) {
         throw new ApiError(409, "User with email or userName already exists")

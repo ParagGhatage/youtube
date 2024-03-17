@@ -20,7 +20,7 @@ export default function Home(){
 return (
     <>
     <Title/>
-    <p>Videos:{health}</p>
+    <p>Health Check:{health}</p>
     </>
 )
 

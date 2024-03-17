@@ -18,7 +18,7 @@ import Contact from './pages/Contact.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={[<Home/>,<Layout/>]}>
+    <Route path='/' element={[<Layout/>]}>
       <Route path='/home' element={<Home/>}/>
       <Route path='/shorts' element={<Shorts/>}/>
       <Route path='/subscriptions' element={<Subscriptions/>}/>
